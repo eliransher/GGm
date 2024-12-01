@@ -71,7 +71,7 @@ class N_Queue_single_station:
         # an event can one of three: (1. arrival, 2. entering service 3. service completion)
         self.num_stations = num_stations
 
-
+        self.server_occupy = np.array([False, False])
         self.servers = []
         self.df_waiting_times = pd.DataFrame([])  # is a dataframe the holds all information waiting time
         self.num_cust_durations = []
@@ -83,6 +83,7 @@ class N_Queue_single_station:
         self.last_depart = []
         self.inter_departures = {}
         self.sojourn_times = []
+        self.busy_times = [0,0]
 
         self.services = services
         self.arrivals = arrivals_norm
@@ -128,8 +129,23 @@ class N_Queue_single_station:
 
             yield req
 
-            ind_ser = np.random.randint(self.services.shape[0])
-            yield self.env.timeout(self.services[ind_ser])
+            if self.server_occupy.sum() == 0:
+                server_type = np.random.randint(2)
+
+
+            elif self.server_occupy.sum() == 1:
+                server_type = self.server_occupy.argmin()
+
+            else:
+                print('Stop')
+            self.server_occupy[server_type] = True
+
+            start_busy_time = self.env.now
+            ind_ser = np.random.randint(self.services[server_type].shape[0])
+            yield self.env.timeout(self.services[server_type][ind_ser])
+
+            self.server_occupy[server_type] = False
+            self.busy_times[server_type] += self.env.now - start_busy_time
 
 
 
@@ -208,24 +224,46 @@ for sample in range(5000):
     moms_arrive = arrivals[2]
 
 
-    services = get_ph()
+    services_1 = get_ph()
+    services_2 = get_ph()
 
-    num_servers = 2 # np.random.randint(1, 6)
-    rate = 1/(rho * num_servers)
-
-    services_norm =  services[3] / rate
-
-    A = services[1] * rate
-    a = services[0]
+    num_servers = 2
 
 
-    moms_ser = np.array(compute_first_n_moments(a, A, 10)).flatten()
+    mean_ser_1 = np.random.uniform(0.05, 2*rho)
+    rate_1 = 1/mean_ser_1
 
-    mom_1_ser = moms_ser[0]
-    mom_2_ser = moms_ser[1]
+    services_norm_1 =  services_1[3] / rate_1
 
-    var_ser = mom_2_ser - mom_1_ser ** 2
-    scv_ser = var_ser / mom_1_ser ** 2
+    A = services_1[1] * rate_1
+    a = services_1[0]
+
+    moms_ser_1 = np.array(compute_first_n_moments(a, A, 10)).flatten()
+
+    mom_1_ser_1 = moms_ser_1[0]
+    mom_2_ser_1 = moms_ser_1[1]
+
+    var_ser_1 = mom_2_ser_1 - mom_1_ser_1 ** 2
+    scv_ser_1 = var_ser_1 / mom_1_ser_1 ** 2
+
+    mean_ser_2 = 2*rho -mean_ser_1  + 0.3
+    rate_2 = 1 / mean_ser_2
+
+    services_norm_2 = services_2[3] / rate_2
+
+    A = services_2[1] * rate_2
+    a = services_2[0]
+
+    moms_ser_2 = np.array(compute_first_n_moments(a, A, 10)).flatten()
+
+    mom_1_ser_2 = moms_ser_2[0]
+    mom_2_ser_2 = moms_ser_2[1]
+
+    var_ser_2 = mom_2_ser_2 - mom_1_ser_2 ** 2
+    scv_ser_2 = var_ser_2 / mom_1_ser_2 ** 2
+
+
+    scv_ser = max(scv_ser_1, scv_ser_2)
 
     if rho > 0.8:
         rho_factor = 1.25
@@ -246,71 +284,69 @@ for sample in range(5000):
         scv_ser_factor = 1.
 
 
-    sim_time = 60000000
+    sim_time = 600000
     sim_time = int(sim_time * rho_factor * scv_ser_factor)
     mu = 1.0
     num_stations = 1
 
-    sim_time = 6000000
-
     print(num_servers)
 
-    lamda = rate
+    lamda = rate_1
     inps = []
     outputs1 = []
     outputs2 = []
 
-    try:
-
-        for trails in tqdm(range(1)):
-
-            n_Queue_single_station = N_Queue_single_station(sim_time, num_stations, services_norm, arrivals[3],
-                                                            num_servers)
-            n_Queue_single_station.run()
-
-            input_ = np.concatenate((moms_arrive, moms_ser), axis=0)
-            # output = n_Queue_single_station.get_steady_single_station()
-
-            end = time.time()
-
-            print(end - begin)
-
-            model_num = np.random.randint(1, 10000000)
-
-            ########### output ############
-
-            station = 0
-
-            ####### Input ################
-
-            inp_steady_0 = np.concatenate((np.log(moms_arrive), np.log(moms_ser), np.array([num_servers])))
-            inps.append(inp_steady_0)
-            ###############################
-            ########### output ############
-
-            output1 = n_Queue_single_station.get_steady_single_station()[0]
-            output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
-
-            mean_val = (np.arange(output1.shape[0])*output1).sum()
-
-            outputs1.append(output1)
-            outputs2.append(output2)
-
-            print(1-outputs1[0][0],outputs1[0][1], rho, num_servers, mom_1_ser, mom_1_ser/num_servers, outputs1[0][1]/2 + rho)
 
 
+    for trails in tqdm(range(1)):
 
-        if sys.platform == 'linux':
-            path_steady_0 = '/scratch/eliransc/n_servers_single'
-        else:
-            path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
+        n_Queue_single_station = N_Queue_single_station(sim_time, num_stations, [services_norm_1, services_norm_2],  arrivals[3],
+                                                        num_servers)
+        n_Queue_single_station.run()
 
-        file_name =  'rho_' + str(rho)[:5] + '_num_servers_' + str(num_servers) + '_sim_time_' + str(sim_time) + 'steady_' + str(
-            model_num) + '.pkl'
+        input_ = np.concatenate((moms_arrive, moms_ser_1, moms_ser_2), axis=0)
+        # output = n_Queue_single_station.get_steady_single_station()
 
-        full_path_steady_0 = os.path.join(path_steady_0, file_name)
-        pkl.dump((inps, outputs1, outputs2), open(full_path_steady_0, 'wb'))
+        end = time.time()
 
-    except:
-        print('cannot find ph dist')
+        print(end - begin)
+
+        model_num = np.random.randint(1, 10000000)
+
+        ########### output ############
+
+        station = 0
+
+        ####### Input ################
+
+        inp_steady_0 = np.concatenate((np.log(moms_arrive), np.log(moms_ser_1), np.log(moms_ser_2), np.array([num_servers])))
+        inps.append(inp_steady_0)
+        ###############################
+        ########### output ############
+
+        output1 = n_Queue_single_station.get_steady_single_station()[0]
+        output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
+
+        mean_val = (np.arange(output1.shape[0])*output1).sum()
+
+        outputs1.append(output1)
+        outputs2.append(output2)
+        print(n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time)
+        print(1-outputs1[0][0],outputs1[0][1],  rho, mean_ser_1, mean_ser_2, 1/(1/mean_ser_2+1/mean_ser_1))
+
+
+
+    if sys.platform == 'linux':
+        path_steady_0 = '/scratch/eliransc/n_servers_single'
+    else:
+        path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
+
+    file_name =  'rho_' + str(rho)[:5] + '_num_servers_' + str(num_servers) + '_sim_time_' + str(sim_time) + 'steady_' + str(
+        model_num) + '.pkl'
+
+    full_path_steady_0 = os.path.join(path_steady_0, file_name)
+    pkl.dump((inps, outputs1, outputs2), open(full_path_steady_0, 'wb'))
+
+    # except:
+    #     print('cannot find ph dist')
 
