@@ -4,6 +4,7 @@ from scipy.special import factorial
 import numpy as np
 import sys
 from scipy.linalg import expm, sinm, cosm
+sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
 
 
 def compute_pdf_within_range(x_vals, s, A):
