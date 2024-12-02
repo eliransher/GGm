@@ -50,8 +50,9 @@ if __name__ == "__main__":
 
         ws = ms ** (-1)
         num_epochs = 300000
+        start = time.time()
         (lambdas, ps, alpha), (a, T) = fit_ph_distribution(ms, use_size, num_epochs=num_epochs, moment_weights=ws)
-
+        runtime = time.time() - start
         original_moments = ms.detach().numpy()
         computed_moments = [m.detach().item() for m in compute_moments(a, T, use_size, n)]
         moment_table = pd.DataFrame([computed_moments, original_moments], index="computed target".split()).T
@@ -59,7 +60,7 @@ if __name__ == "__main__":
         moment_table["delta-relative"] = moment_table["delta"] / moment_table["target"]
         print(moment_table)
         path  = '/scratch/eliransc/mom_match'
-        file_name = 'num_run_' + str(num_run) + '_num_moms_'+str(n)+ '_orig_size_'+ str(orig_size)+'_use_size_'+str(use_size)+'_epochs_'+str(num_epochs)+'.pkl'
+        file_name = 'num_run_' + str(num_run) + '_num_moms_'+str(n)+ '_orig_size_'+ str(orig_size)+'_use_size_'+str(use_size)+'_epochs_'+str(num_epochs)+'_runtime_'+ str(runtime) + '.pkl'
         full_path = os.path.join(path, file_name)
         pkl.dump(moment_table, open(full_path, 'wb'))
 
