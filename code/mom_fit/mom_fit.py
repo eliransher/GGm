@@ -62,7 +62,9 @@ if __name__ == "__main__":
         path  = '/scratch/eliransc/mom_match'
         file_name = 'num_run_' + str(num_run) + '_num_moms_'+str(n)+ '_orig_size_'+ str(orig_size)+'_use_size_'+str(use_size)+'_epochs_'+str(num_epochs)+'_runtime_'+ str(runtime) + '.pkl'
         full_path = os.path.join(path, file_name)
-        pkl.dump(moment_table, open(full_path, 'wb'))
+        # pkl.dump(moment_table, open(full_path, 'wb'))
+        print(file_name)
+
 
 
 
