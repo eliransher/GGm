@@ -251,7 +251,7 @@ for sample in range(5000):
     mu = 1.0
     num_stations = 1
 
-    sim_time = 6000000
+    sim_time = 60000000
 
     print(num_servers)
 
