@@ -309,6 +309,7 @@ for sample in range(5000):
             model_num) + '.pkl'
 
         full_path_steady_0 = os.path.join(path_steady_0, file_name)
+        print(full_path_steady_0)
         pkl.dump((inps, outputs1, outputs2), open(full_path_steady_0, 'wb'))
 
     except:
