@@ -251,7 +251,7 @@ for sample in range(5000):
     mu = 1.0
     num_stations = 1
 
-    sim_time = 6000
+    sim_time = 60000000
 
     print(num_servers)
 
@@ -263,55 +263,55 @@ for sample in range(5000):
 
 
     for trails in tqdm(range(1)):
+        try:
+            n_Queue_single_station = N_Queue_single_station(sim_time, num_stations, services_norm, arrivals[3],
+                                                            num_servers)
+            n_Queue_single_station.run()
 
-        n_Queue_single_station = N_Queue_single_station(sim_time, num_stations, services_norm, arrivals[3],
-                                                        num_servers)
-        n_Queue_single_station.run()
+            input_ = np.concatenate((moms_arrive, moms_ser), axis=0)
+            # output = n_Queue_single_station.get_steady_single_station()
 
-        input_ = np.concatenate((moms_arrive, moms_ser), axis=0)
-        # output = n_Queue_single_station.get_steady_single_station()
+            end = time.time()
 
-        end = time.time()
+            print(end - begin)
 
-        print(end - begin)
+            model_num = np.random.randint(1, 10000000)
 
-        model_num = np.random.randint(1, 10000000)
+            ########### output ############
 
-        ########### output ############
+            station = 0
 
-        station = 0
+            ####### Input ################
 
-        ####### Input ################
+            inp_steady_0 = np.concatenate((np.log(moms_arrive), np.log(moms_ser), np.array([num_servers])))
+            inps.append(inp_steady_0)
+            ###############################
+            ########### output ############
 
-        inp_steady_0 = np.concatenate((np.log(moms_arrive), np.log(moms_ser), np.array([num_servers])))
-        inps.append(inp_steady_0)
-        ###############################
-        ########### output ############
+            output1 = n_Queue_single_station.get_steady_single_station()[0]
+            output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
 
-        output1 = n_Queue_single_station.get_steady_single_station()[0]
-        output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
+            mean_val = (np.arange(output1.shape[0])*output1).sum()
 
-        mean_val = (np.arange(output1.shape[0])*output1).sum()
+            outputs1.append(output1)
+            outputs2.append(output2)
 
-        outputs1.append(output1)
-        outputs2.append(output2)
-
-        print(1-outputs1[0][0],outputs1[0][1], rho, num_servers, mom_1_ser, mom_1_ser/num_servers, outputs1[0][1]/2 + rho)
+            print(1-outputs1[0][0],outputs1[0][1], rho, num_servers, mom_1_ser, mom_1_ser/num_servers, outputs1[0][1]/2 + rho)
 
 
 
-    if sys.platform == 'linux':
-        path_steady_0 = '/scratch/eliransc/n_servers_single2'
-    else:
-        path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
+        if sys.platform == 'linux':
+            path_steady_0 = '/scratch/eliransc/n_servers_single2'
+        else:
+            path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
 
-    file_name =  'rho_' + str(rho)[:5] + '_num_servers_' + str(num_servers) + '_sim_time_' + str(sim_time) + 'steady_' + str(
-        model_num) + '.pkl'
+        file_name =  'rho_' + str(rho)[:5] + '_num_servers_' + str(num_servers) + '_sim_time_' + str(sim_time) + 'steady_' + str(
+            model_num) + '.pkl'
 
-    full_path_steady_0 = os.path.join(path_steady_0, file_name)
-    print(full_path_steady_0)
-    pkl.dump((inps, outputs1, outputs2), open(full_path_steady_0, 'wb'))
+        full_path_steady_0 = os.path.join(path_steady_0, file_name)
+        print(full_path_steady_0)
+        pkl.dump((inps, outputs1, outputs2), open(full_path_steady_0, 'wb'))
 
-    # except:
-    #     print('cannot find ph dist')
+    except:
+        print('cannot find ph dist')
 
