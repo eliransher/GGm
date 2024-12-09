@@ -260,10 +260,9 @@ for sample in range(5000):
     outputs1 = []
     outputs2 = []
 
+    try:
+        for trails in tqdm(range(1)):
 
-
-    for trails in tqdm(range(1)):
-        try:
             n_Queue_single_station = N_Queue_single_station(sim_time, num_stations, services_norm, arrivals[3],
                                                             num_servers)
             n_Queue_single_station.run()
