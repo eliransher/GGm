@@ -210,7 +210,7 @@ for sample in range(5000):
 
     services = get_ph()
 
-    num_servers = 2 # np.random.randint(1, 6)
+    num_servers = np.random.randint(1, 6)
     rate = 1/(rho * num_servers)
 
     services_norm =  services[3] / rate
