@@ -300,7 +300,7 @@ for sample in range(5000):
 
 
         if sys.platform == 'linux':
-            path_steady_0 = '/scratch/eliransc/new_n_servers/6_10_servers'
+            path_steady_0 = '/scratch/eliransc/6_10_servers_data'
         else:
             path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
 

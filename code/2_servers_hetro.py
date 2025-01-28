@@ -229,9 +229,13 @@ for sample in range(5000):
 
     num_servers = 2
 
+    sum_rates = 1 / np.random.uniform(1 / 20, 1 / 1.035)
 
-    mean_ser_1 = np.random.uniform(0.05, 2*rho)
-    rate_1 = 1/mean_ser_1
+    rate_1 = np.random.uniform(0.03, sum_rates)
+    rate_2 = sum_rates - rate_1
+
+    mean_ser_1 = 1/rate_1
+    mean_ser_2 = 1 / rate_2
 
     services_norm_1 =  services_1[3] / rate_1
 
@@ -284,7 +288,7 @@ for sample in range(5000):
         scv_ser_factor = 1.
 
 
-    sim_time = 600000
+    sim_time = 6000
     sim_time = int(sim_time * rho_factor * scv_ser_factor)
     mu = 1.0
     num_stations = 1
