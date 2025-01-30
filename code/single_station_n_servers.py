@@ -210,7 +210,7 @@ for sample in range(5000):
 
     services = get_ph()
 
-    num_servers = np.random.randint(6, 11)
+    num_servers = np.random.randint(3, 11)
     rate = 1/(rho * num_servers)
 
     services_norm =  services[3] / rate
@@ -300,7 +300,7 @@ for sample in range(5000):
 
 
         if sys.platform == 'linux':
-            path_steady_0 = '/scratch/eliransc/6_10_servers_data'
+            path_steady_0 = '/scratch/eliransc/3_10_servers_data'
         else:
             path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
 

@@ -209,148 +209,147 @@ def get_ph():
     data_all = pkl.load(open(os.path.join(path,folders[folder_ind], files[ind_file1]), 'rb'))
 
     return data_all
+rhos_list = []
+for sample in tqdm(range(500)):
 
-for sample in range(5000):
+    try:
+        begin = time.time()
 
+        arrivals = get_ph()
+        rho = np.random.uniform(0.02, 0.95)
+        arrive_moms = []
+        for mom in range(1, 11):
+            arrive_moms.append(factorial(mom) / 1 ** mom)
 
-    begin = time.time()
-
-    arrivals = get_ph()
-    rho = np.random.uniform(0.02, 0.95)
-    arrive_moms = []
-    for mom in range(1, 11):
-        arrive_moms.append(factorial(mom) / 1 ** mom)
-
-    moms_arrive = arrivals[2]
-
-
-    services_1 = get_ph()
-    services_2 = get_ph()
-
-    num_servers = 2
-
-    sum_rates = 1 / np.random.uniform(1 / 20, 1 / 1.035)
-
-    rate_1 = np.random.uniform(0.03, sum_rates)
-    rate_2 = sum_rates - rate_1
-
-    mean_ser_1 = 1/rate_1
-    mean_ser_2 = 1 / rate_2
-
-    services_norm_1 =  services_1[3] / rate_1
-
-    A = services_1[1] * rate_1
-    a = services_1[0]
-
-    moms_ser_1 = np.array(compute_first_n_moments(a, A, 10)).flatten()
-
-    mom_1_ser_1 = moms_ser_1[0]
-    mom_2_ser_1 = moms_ser_1[1]
-
-    var_ser_1 = mom_2_ser_1 - mom_1_ser_1 ** 2
-    scv_ser_1 = var_ser_1 / mom_1_ser_1 ** 2
-
-    mean_ser_2 = 2*rho -mean_ser_1  + 0.3
-    rate_2 = 1 / mean_ser_2
-
-    services_norm_2 = services_2[3] / rate_2
-
-    A = services_2[1] * rate_2
-    a = services_2[0]
-
-    moms_ser_2 = np.array(compute_first_n_moments(a, A, 10)).flatten()
-
-    mom_1_ser_2 = moms_ser_2[0]
-    mom_2_ser_2 = moms_ser_2[1]
-
-    var_ser_2 = mom_2_ser_2 - mom_1_ser_2 ** 2
-    scv_ser_2 = var_ser_2 / mom_1_ser_2 ** 2
+        moms_arrive = arrivals[2]
 
 
-    scv_ser = max(scv_ser_1, scv_ser_2)
+        services_1 = get_ph()
+        services_2 = get_ph()
 
-    if rho > 0.8:
-        rho_factor = 1.25
-    elif rho > 0.6:
-        rho_factor = 1.1
-    elif rho > 0.4:
-        rho_factor = 1.05
-    else:
-        rho_factor = 1.
+        num_servers = 2
 
-    if scv_ser > 10:
-        scv_ser_factor = 1.25
-    elif scv_ser > 4:
-        scv_ser_factor = 1.15
-    elif scv_ser > 2:
-        scv_ser_factor = 1.05
-    else:
-        scv_ser_factor = 1.
+        sum_rates = 1 / np.random.uniform(1 / 20, 1 / 1.035)
 
+        rate_1 = np.random.uniform(0.03, sum_rates)
+        rate_2 = sum_rates - rate_1
 
-    sim_time = 6000
-    sim_time = int(sim_time * rho_factor * scv_ser_factor)
-    mu = 1.0
-    num_stations = 1
+        mean_ser_1 = 1/rate_1
+        mean_ser_2 = 1 / rate_2
 
-    print(num_servers)
+        services_norm_1 =  services_1[3] / rate_1
 
-    lamda = rate_1
-    inps = []
-    outputs1 = []
-    outputs2 = []
+        A = services_1[1] * rate_1
+        a = services_1[0]
+
+        moms_ser_1 = np.array(compute_first_n_moments(a, A, 10)).flatten()
+
+        mom_1_ser_1 = moms_ser_1[0]
+        mom_2_ser_1 = moms_ser_1[1]
+
+        var_ser_1 = mom_2_ser_1 - mom_1_ser_1 ** 2
+        scv_ser_1 = var_ser_1 / mom_1_ser_1 ** 2
 
 
+        services_norm_2 = services_2[3] / rate_2
 
-    for trails in tqdm(range(1)):
+        A = services_2[1] * rate_2
+        a = services_2[0]
 
-        n_Queue_single_station = N_Queue_single_station(sim_time, num_stations, [services_norm_1, services_norm_2],  arrivals[3],
-                                                        num_servers)
-        n_Queue_single_station.run()
 
-        input_ = np.concatenate((moms_arrive, moms_ser_1, moms_ser_2), axis=0)
-        # output = n_Queue_single_station.get_steady_single_station()
+        moms_ser_2 = np.array(compute_first_n_moments(a, A, 10)).flatten()
 
-        end = time.time()
+        mom_1_ser_2 = moms_ser_2[0]
+        mom_2_ser_2 = moms_ser_2[1]
 
-        print(end - begin)
+        var_ser_2 = mom_2_ser_2 - mom_1_ser_2 ** 2
+        scv_ser_2 = var_ser_2 / mom_1_ser_2 ** 2
 
-        model_num = np.random.randint(1, 10000000)
 
-        ########### output ############
+        scv_ser = max(scv_ser_1, scv_ser_2)
 
-        station = 0
+        if rho > 0.8:
+            rho_factor = 1.25
+        elif rho > 0.6:
+            rho_factor = 1.1
+        elif rho > 0.4:
+            rho_factor = 1.05
+        else:
+            rho_factor = 1.
 
-        ####### Input ################
+        if scv_ser > 10:
+            scv_ser_factor = 1.25
+        elif scv_ser > 4:
+            scv_ser_factor = 1.15
+        elif scv_ser > 2:
+            scv_ser_factor = 1.05
+        else:
+            scv_ser_factor = 1.
 
-        inp_steady_0 = np.concatenate((np.log(moms_arrive), np.log(moms_ser_1), np.log(moms_ser_2), np.array([num_servers])))
-        inps.append(inp_steady_0)
-        ###############################
-        ########### output ############
 
-        output1 = n_Queue_single_station.get_steady_single_station()[0]
-        output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
+        sim_time = 60000000
+        sim_time = int(sim_time * rho_factor * scv_ser_factor)
+        mu = 1.0
+        num_stations = 1
 
-        mean_val = (np.arange(output1.shape[0])*output1).sum()
+        # print(num_servers)
 
-        outputs1.append(output1)
-        outputs2.append(output2)
-        print(n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time)
-        print(1-outputs1[0][0],outputs1[0][1],  rho, mean_ser_1, mean_ser_2, 1/(1/mean_ser_2+1/mean_ser_1))
+        lamda = rate_1
+        inps = []
+        outputs1 = []
+        outputs2 = []
 
 
 
-    if sys.platform == 'linux':
-        path_steady_0 = '/scratch/eliransc/n_servers_single'
-    else:
-        path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
+        for trails in range(1):
 
-    file_name =  'rho_' + str(rho)[:5] + '_num_servers_' + str(num_servers) + '_sim_time_' + str(sim_time) + 'steady_' + str(
-        model_num) + '.pkl'
+            n_Queue_single_station = N_Queue_single_station(sim_time, num_stations, [services_norm_1, services_norm_2],  arrivals[3],
+                                                            num_servers)
+            n_Queue_single_station.run()
 
-    full_path_steady_0 = os.path.join(path_steady_0, file_name)
-    pkl.dump((inps, outputs1, outputs2), open(full_path_steady_0, 'wb'))
+            input_ = np.concatenate((moms_arrive, moms_ser_1, moms_ser_2), axis=0)
+            # output = n_Queue_single_station.get_steady_single_station()
 
-    # except:
-    #     print('cannot find ph dist')
+            end = time.time()
+
+            # print(end - begin)
+
+            model_num = np.random.randint(1, 10000000)
+
+            ########### output ############
+
+            station = 0
+
+            ####### Input ################
+
+            inp_steady_0 = np.concatenate((np.log(moms_arrive), np.log(moms_ser_1), np.log(moms_ser_2), np.array([num_servers])))
+            inps.append(inp_steady_0)
+            ###############################
+            ########### output ############
+
+            output1 = n_Queue_single_station.get_steady_single_station()[0]
+            output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
+
+            mean_val = (np.arange(output1.shape[0])*output1).sum()
+
+            outputs1.append(output1)
+            outputs2.append(output2)
+            print(n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time)
+            # print(1-outputs1[0][0],outputs1[0][1],  rho, mean_ser_1, mean_ser_2, 1/(1/mean_ser_2+1/mean_ser_1))
+            # rhos_list.append([n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time])
+
+
+        if sys.platform == 'linux':
+            path_steady_0 = '/scratch/eliransc/n_servers_single'
+        else:
+            path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
+
+        file_name =  'rho_' + str(rho)[:5] + '_num_servers_' + str(num_servers) + '_sim_time_' + str(sim_time) + 'steady_' + str(
+            model_num) + '.pkl'
+
+        full_path_steady_0 = os.path.join(path_steady_0, file_name)
+        pkl.dump((inps, outputs1, outputs2), open(full_path_steady_0, 'wb'))
+        pkl.dump(rhos_list, open(r'C:\Users\Eshel\workspace\data\mom_mathcher_data/rho_list.pkl', 'wb'))
+    except:
+        print('exceed 500')
 
