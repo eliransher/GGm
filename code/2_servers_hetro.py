@@ -82,7 +82,7 @@ class N_Queue_single_station:
         self.df_events = []  # is a dataframe the holds all information of the queue dynamic:
         self.last_depart = []
         self.inter_departures = {}
-        self.sojourn_times = []
+        # self.sojourn_times = []
         self.busy_times = [0,0]
 
         self.services = services
@@ -158,7 +158,7 @@ class N_Queue_single_station:
             self.last_event_time[station] = self.env.now
 
             sojourn_time = self.env.now.item() -  customer.arrival_time.item()
-            self.sojourn_times.append(sojourn_time)
+            # self.sojourn_times.append(sojourn_time)
 
     #########################################################
     ################# Arrival block #########################
@@ -299,8 +299,6 @@ for sample in tqdm(range(500)):
         outputs1 = []
         outputs2 = []
 
-
-
         for trails in range(1):
 
             n_Queue_single_station = N_Queue_single_station(sim_time, num_stations, [services_norm_1, services_norm_2],  arrivals[3],
@@ -328,19 +326,19 @@ for sample in tqdm(range(500)):
             ########### output ############
 
             output1 = n_Queue_single_station.get_steady_single_station()[0]
-            output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
+            # output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
 
             mean_val = (np.arange(output1.shape[0])*output1).sum()
 
             outputs1.append(output1)
-            outputs2.append(output2)
+            # outputs2.append(output2)
             print(n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time)
             # print(1-outputs1[0][0],outputs1[0][1],  rho, mean_ser_1, mean_ser_2, 1/(1/mean_ser_2+1/mean_ser_1))
             # rhos_list.append([n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time])
 
 
         if sys.platform == 'linux':
-            path_steady_0 = '/scratch/eliransc/n_servers_single'
+            path_steady_0 = '/scratch/eliransc/2_servers_hetro'
         else:
             path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
 
@@ -348,7 +346,7 @@ for sample in tqdm(range(500)):
             model_num) + '.pkl'
 
         full_path_steady_0 = os.path.join(path_steady_0, file_name)
-        pkl.dump((inps, outputs1, outputs2), open(full_path_steady_0, 'wb'))
+        pkl.dump((inps, outputs1), open(full_path_steady_0, 'wb'))
         pkl.dump(rhos_list, open(r'C:\Users\Eshel\workspace\data\mom_mathcher_data/rho_list.pkl', 'wb'))
     except:
         print('exceed 500')
