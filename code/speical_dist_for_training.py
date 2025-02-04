@@ -153,7 +153,7 @@ def compute_first_ten_moms_log_N(s):
         moms.append((s**ind).mean())
     return moms
 
-def generate_gamma(is_arrival, rho = 0.01):
+def generate_gamma(is_arrival, scale = 4, shape = 0.5, rho = 0.01):
     if is_arrival:
         # rho = np.random.uniform(0.7, 0.99)
         shape = 0.25/rho # 0.25 # np.random.uniform(0.1, 100)
@@ -163,8 +163,8 @@ def generate_gamma(is_arrival, rho = 0.01):
             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
         return (shape, scale, moms_arr)
     else:
-        shape = 0.25 # np.random.uniform(1, 100)
-        scale = 1 / shape
+        # shape = 0.25 # np.random.uniform(1, 100)
+        # scale = 1 / shape
         moms_ser = np.array([])
         for mom in range(1, 11):
             moms_ser = np.append(moms_ser, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
@@ -379,7 +379,7 @@ def get_ph():
 
 
 def get_setup():
-    rhos = np.linspace(0.01, 0.96, 20)
+    rhos = np.linspace(0.01, 0.96, 200)
     num_servers = np.linspace(1, 10, 10).astype(int)
 
     rho = np.random.choice(rhos).item()
@@ -392,7 +392,7 @@ def get_setup():
 
 def get_moms_realizations(rho, num_server, dist, sample_size, is_arrive):
     if dist == 'LN025':
-        scv = 0.25
+        scv = np.random.uniform(.2, 0.3)
         times = log_normal_gener(1, scv, sample_size)
         if is_arrive == True:
             mean = 1
@@ -402,7 +402,7 @@ def get_moms_realizations(rho, num_server, dist, sample_size, is_arrive):
         moms = compute_first_ten_moms_log_N(times)
 
     if dist == 'LN4':
-        scv = 4.0
+        scv = np.random.uniform(3.0, 4.0)
         times = log_normal_gener(1, scv, sample_size)
         if is_arrive == True:
             mean = 1
@@ -413,7 +413,9 @@ def get_moms_realizations(rho, num_server, dist, sample_size, is_arrive):
 
     if dist == 'G4':
 
-        shape, scale, moms_ = generate_gamma(False, rho)
+        scale = np.random.randint(3, 6)
+        shape = np.random.uniform(0.1, 0.5)
+        shape, scale, moms_ = generate_gamma(False, scale, shape, rho)
 
         times = np.random.gamma(shape, scale, sample_size)
         if is_arrive == True:
@@ -555,7 +557,7 @@ for sample in range(5000):
 
 
         if sys.platform == 'linux':
-                path_steady_0 = '/scratch/eliransc/n_servers_speical_test'
+                path_steady_0 = '/scratch/eliransc/n_servers_speical_train'
         else:
             path_steady_0 = r'C:\Users\Eshel\workspace\data\n_servers_speical_test'
 
