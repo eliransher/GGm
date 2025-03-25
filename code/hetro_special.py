@@ -574,6 +574,8 @@ for sample in tqdm(range(500)):
             # output2 = np.array(n_Queue_single_station.sojourn_times).mean().item()
 
             mean_val = (np.arange(output1.shape[0])*output1).sum()
+            rho_1 = n_Queue_single_station.busy_times[0]/sim_time
+            rho_2 = n_Queue_single_station.busy_times[1]/sim_time
 
             outputs1.append(output1)
             # outputs2.append(output2)
@@ -582,12 +584,14 @@ for sample in tqdm(range(500)):
             # rhos_list.append([n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time], rate_1, rate_2)
             pkl.dump(rhos_list, open(r'C:\Users\Eshel\workspace\data\mom_mathcher_data/rho_list.pkl', 'wb'))
 
+        rho = (rho_1 + rho_2) / 2
+        rho_str = str(rho.item())[:4]
         if sys.platform == 'linux':
                 path_steady_0 = '/scratch/eliransc/2_servers_hetro_special'
         else:
             path_steady_0 = r'C:\Users\Eshel\workspace\data\hetro_data\ggc_test_data_special'
 
-        file_name = ('rho_' + str(rho)[:5] + '_num_servers_' + str(num_server) + '_arrival_dist_' + arrival_dics[
+        file_name = ('rho_' + rho_str + '_num_servers_' + str(num_server) + '_arrival_dist_' + arrival_dics[
             arrive_key]
                      + '_ser_dist1_' + ser_dics[ser_key_1]+ '_ser_dist2_' + ser_dics[ser_key_2] + '_sim_time_' + str(sim_time) + 'steady_' + str(
                     model_num) + '.pkl')
