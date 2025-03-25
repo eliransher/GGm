@@ -532,7 +532,7 @@ for sample in tqdm(range(500)):
             scv_ser_factor = 1.
 
 
-        sim_time = 60000000
+        sim_time = 50000000
         sim_time = int(sim_time * rho_factor * scv_ser_factor)
         mu = 1.0
         num_stations = 1
