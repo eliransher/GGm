@@ -191,9 +191,6 @@ class N_Queue_single_station:
         return np.array(steady_list).reshape(self.num_stations, 500)
 
 
-
-
-
 def get_ph():
     if sys.platform == 'linux':
         path = '/scratch/eliransc/ph_samples'
@@ -287,7 +284,7 @@ for sample in tqdm(range(500)):
             scv_ser_factor = 1.
 
 
-        sim_time = 60000000
+        sim_time = 6000000
         sim_time = int(sim_time * rho_factor * scv_ser_factor)
         mu = 1.0
         num_stations = 1
@@ -334,11 +331,11 @@ for sample in tqdm(range(500)):
             # outputs2.append(output2)
             print(n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time)
             # print(1-outputs1[0][0],outputs1[0][1],  rho, mean_ser_1, mean_ser_2, 1/(1/mean_ser_2+1/mean_ser_1))
-            # rhos_list.append([n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time])
-
+            rhos_list.append([n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time], rate_1, rate_2)
+            pkl.dump(rhos_list, open(r'C:\Users\Eshel\workspace\data\mom_mathcher_data/rho_list.pkl', 'wb'))
 
         if sys.platform == 'linux':
-            path_steady_0 = '/scratch/eliransc/2_servers_hetro'
+                path_steady_0 = '/scratch/eliransc/2_servers_hetro_low'
         else:
             path_steady_0 = r'C:\Users\Eshel\workspace\data\ggc_training_data'
 
@@ -347,7 +344,7 @@ for sample in tqdm(range(500)):
 
         full_path_steady_0 = os.path.join(path_steady_0, file_name)
         pkl.dump((inps, outputs1), open(full_path_steady_0, 'wb'))
-        pkl.dump(rhos_list, open(r'C:\Users\Eshel\workspace\data\mom_mathcher_data/rho_list.pkl', 'wb'))
+        # pkl.dump(rhos_list, open(r'C:\Users\Eshel\workspace\data\mom_mathcher_data/rho_list.pkl', 'wb'))
     except:
         print('exceed 500')
 
