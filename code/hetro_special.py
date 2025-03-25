@@ -582,7 +582,7 @@ for sample in tqdm(range(500)):
             print(n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time)
             # print(1-outputs1[0][0],outputs1[0][1],  rho, mean_ser_1, mean_ser_2, 1/(1/mean_ser_2+1/mean_ser_1))
             # rhos_list.append([n_Queue_single_station.busy_times[0]/sim_time, n_Queue_single_station.busy_times[1]/sim_time], rate_1, rate_2)
-            pkl.dump(rhos_list, open(r'C:\Users\Eshel\workspace\data\mom_mathcher_data/rho_list.pkl', 'wb'))
+            # pkl.dump(rhos_list, open(r'C:\Users\Eshel\workspace\data\mom_mathcher_data/rho_list.pkl', 'wb'))
 
         rho = (rho_1 + rho_2) / 2
         rho_str = str(rho.item())[:4]
